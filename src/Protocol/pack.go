@@ -19,12 +19,12 @@ func EnpackClip(content []byte) (packet []byte) {
 	return append(head, content...)
 }
 
-func DepackClip(content []byte) (int, string) {
+func DepackClip(content []byte) (int, []byte) {
 	fmode := int(binary.LittleEndian.Uint32(content[:4]))
 	clip := make([]byte, len(content)-4)
 	copy(clip, content[4:])
 	fastReverse(clip)
-	return fmode, string(clip)
+	return fmode, clip
 }
 
 const wordSize = int(unsafe.Sizeof(uintptr(0)))

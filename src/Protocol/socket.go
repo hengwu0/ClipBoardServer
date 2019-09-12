@@ -7,6 +7,7 @@ import (
 	"net"
 	"sync"
 	"time"
+	"unicode/utf16"
 )
 
 var listen net.Listener
@@ -19,6 +20,10 @@ type Conn struct {
 
 func (c *Conn) SetLogger(logger *log.Logger) {
 	c.logger = logger
+}
+
+func (c *Conn) GetLogger() (logger *log.Logger) {
+	return c.logger
 }
 
 func (c *Conn) AccessGetHash(logger *log.Logger) (hash string) {
@@ -86,6 +91,15 @@ func (c *Conn) RecvCmd(buf []byte) (flag byte, size int) {
 	return
 }
 
+func BytesToUint16(array []byte) []uint16 {
+	lenth := len(array)
+	data := make([]uint16, lenth/2)
+	//请注意，读越界会引发panic
+	for i := 0; i+1 < lenth; i += 2 {
+		data[i/2] = uint16(array[i+1])<<8 + uint16(array[i])
+	}
+	return data
+}
 func (c *Conn) GetClip(size int) (bool, []byte) {
 	buf := make([]byte, size)
 
@@ -97,7 +111,11 @@ func (c *Conn) GetClip(size int) (bool, []byte) {
 	c.conn.SetReadDeadline(time.Time{})
 
 	ftype, clip := DepackClip(buf)
-	c.logger.Printf("recv clip: %s: type:%d %s", c.conn.RemoteAddr().String(), ftype, clip)
+	if ftype == 13 {
+		c.logger.Printf("recv clip: %s: type:%d %s", c.conn.RemoteAddr().String(), ftype, string(utf16.Decode(BytesToUint16(clip))))
+	} else {
+		c.logger.Printf("recv clip: %s: type:%d %s", c.conn.RemoteAddr().String(), ftype, string(clip))
+	}
 	return true, buf
 }
 

@@ -45,6 +45,8 @@ type Node struct {
 
 //go ParseCmd
 func (node *Node) ParseCmd() {
+	tOld := time.Now()
+	tNow := tOld
 	buf := make([]byte, protocol.PackheadSize)
 	for {
 		head, size := node.conn.RecvCmd(buf)
@@ -59,7 +61,14 @@ func (node *Node) ParseCmd() {
 				node.Remove()
 				return
 			} else if len(clip) > 0 {
-				node.deliver(clip)
+				//跳过小于0.5秒的操作
+				tNow = time.Now()
+				if tNow.Sub(tOld) > time.Second {
+					node.deliver(clip)
+				} else {
+					node.conn.GetLogger().Printf("Ignored! %s: Duration < 1s!!!\n", node.conn.GetAddr())
+				}
+				tOld = tNow
 			}
 		default: //数据错误，关闭连接
 			node.Remove()
