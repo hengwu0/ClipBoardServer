@@ -1,0 +1,17 @@
+[Unit]
+Description=Clip Server
+After=network.target
+
+[Service]
+Type=forking
+PIDFile=/home/wuheng/Clip/pidfile
+ExecStart=/home/wuheng/Clip/runme.sh
+ExecStop=/bin/kill -9 $MAINPID
+LimitCORE=infinity
+TimeoutStartSec=0
+Restart=on-abnormal
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
+
