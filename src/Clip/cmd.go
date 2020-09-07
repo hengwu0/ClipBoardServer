@@ -3,6 +3,7 @@ package main
 import (
 	"Algorithm"
 	"Protocol"
+	"flag"
 	"fmt"
 	"os"
 )
@@ -20,8 +21,17 @@ func writePid() {
 }
 
 func main() {
-	if len(os.Args) != 1 {
-		fmt.Println("don't need more args:", os.Args[1:])
+	var h bool
+	var c string
+	flag.BoolVar(&h, "h", false, "show this help")
+	flag.StringVar(&c, "c", "", "set `CONFIG_PATH` path")
+	flag.Parse()
+
+	if c != "" {
+		os.Setenv("CONFIG_PATH", c)
+	}
+	if h || flag.NArg() > 0 {
+		flag.PrintDefaults()
 		return
 	}
 	writePid()

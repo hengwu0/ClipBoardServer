@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"log"
 	"os"
+	"path"
 )
 
 //ok=1:Need Update
@@ -31,7 +32,8 @@ func IsRegister(logger *log.Logger, key []byte) bool {
 
 	var f *os.File
 	var err error
-	if f, err = os.Open(name); err != nil {
+	config_path := os.Getenv("CONFIG_PATH")
+	if f, err = os.Open(path.Join(config_path, name)); err != nil {
 		logger.Printf("Can't open register file: %v\n", err)
 		return false
 	}
