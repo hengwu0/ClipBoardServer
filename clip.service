@@ -4,8 +4,7 @@ After=network.target
 
 [Service]
 Type=forking
-PIDFile=/home/wuheng/Clip/pidfile
-ExecStart=/home/wuheng/Clip/runme.sh
+ExecStart=/home/wuheng/Clip/Clip -c /home/wuheng/Clip
 ExecStop=/bin/kill -9 $MAINPID
 LimitCORE=infinity
 TimeoutStartSec=0
